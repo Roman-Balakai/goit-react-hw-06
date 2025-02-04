@@ -1,13 +1,9 @@
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { nanoid } from "nanoid";
-import { useId } from "react";
 import * as Yup from "yup";
 import s from "./ContactForm.module.css";
-const initialValues = {
-  id: "",
-  name: "",
-  number: "",
-};
+import { useDispatch } from "react-redux";
+import { addContacts } from "../../redux/contactsSlice";
 
 const FeedbackSchema = Yup.object().shape({
   name: Yup.string()
@@ -17,32 +13,37 @@ const FeedbackSchema = Yup.object().shape({
   number: Yup.number().required("Required"),
 });
 
-function ContactForm({ onAdd }) {
-  const nameId = useId();
-  const numberId = useId();
+function ContactForm() {
+  const initialValues = {
+    // id: "",
+    name: "",
+    number: "",
+  };
+  const dispatch = useDispatch();
 
-  const handleSubmit = (values, actions) => {
-    onAdd({
+  const onSubmit = (values, options) => {
+    const newContact = {
       id: nanoid(),
       name: values.name,
       number: values.number,
-    });
-    actions.resetForm();
+    };
+    dispatch(addContacts(newContact));
+    options.resetForm();
   };
 
   return (
     <>
       <Formik
         initialValues={initialValues}
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
         validationSchema={FeedbackSchema}
       >
         <Form className={s.formContainer}>
-          <label htmlFor={nameId}>Name</label>
-          <Field type="text" name="name" id={nameId} />
+          <label htmlFor="name">Name</label>
+          <Field type="text" name="name" id="name" />
           <ErrorMessage name="name" component="span" />
-          <label htmlFor={numberId}>Number</label>
-          <Field type="number" name="number" id={numberId} />
+          <label htmlFor="number">Number</label>
+          <Field type="number" name="number" id="number" />
           <ErrorMessage name="number" component="span" />
           <button type="submit">Add contact</button>
         </Form>
